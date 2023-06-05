@@ -17,7 +17,7 @@ import (
 	"context"
 
 	trivy "github.com/aquasecurity/trivy-operator/pkg/apis/aquasecurity/v1alpha1"
-	openapi_v2 "github.com/google/gnostic/openapiv2"
+	rollout "github.com/argoproj/argo-rollouts/pkg/apis/rollouts/v1alpha1"
 	"github.com/k8sgpt-ai/k8sgpt/pkg/ai"
 	"github.com/k8sgpt-ai/k8sgpt/pkg/kubernetes"
 	appsv1 "k8s.io/api/apps/v1"
@@ -32,13 +32,12 @@ type IAnalyzer interface {
 }
 
 type Analyzer struct {
-	Client        *kubernetes.Client
-	Context       context.Context
-	Namespace     string
-	AIClient      ai.IAI
-	PreAnalysis   map[string]PreAnalysis
-	Results       []Result
-	OpenapiSchema *openapi_v2.Document
+	Client      *kubernetes.Client
+	Context     context.Context
+	Namespace   string
+	AIClient    ai.IAI
+	PreAnalysis map[string]PreAnalysis
+	Results     []Result
 }
 
 type PreAnalysis struct {
@@ -54,6 +53,7 @@ type PreAnalysis struct {
 	StatefulSet              appsv1.StatefulSet
 	NetworkPolicy            networkv1.NetworkPolicy
 	Node                     v1.Node
+	Rollout                  rollout.Rollout
 	// Integrations
 	TrivyVulnerabilityReport trivy.VulnerabilityReport
 }
@@ -67,9 +67,8 @@ type Result struct {
 }
 
 type Failure struct {
-	Text          string
-	KubernetesDoc string
-	Sensitive     []Sensitive
+	Text      string
+	Sensitive []Sensitive
 }
 
 type Sensitive struct {
